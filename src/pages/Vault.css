@@ -1,0 +1,146 @@
+.vault-page {
+  padding-top: 64px;
+  min-height: 100vh;
+}
+
+.vault-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+.vault-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.vault-title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+.vault-subtitle {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 4px 0 0;
+  font-family: var(--font-mono);
+}
+
+.vault-filters {
+  display: flex;
+  gap: 6px;
+}
+
+.vault-filter {
+  padding: 6px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.vault-filter:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.vault-filter.active {
+  background: var(--gradient-primary);
+  border-color: transparent;
+  color: #fff;
+}
+
+.vault-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Empty states */
+.vault-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  animation: fadeInUp 0.5s ease;
+}
+
+.vault-empty-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+}
+
+.vault-empty h2 {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 400;
+  margin: 0 0 8px;
+}
+
+.vault-empty p {
+  color: var(--text-secondary);
+  margin: 0 0 24px;
+}
+
+.vault-connect-btn {
+  padding: 12px 28px;
+  background: var(--gradient-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-xl);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.vault-connect-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+}
+
+.vault-empty-state {
+  text-align: center;
+  padding: 80px 24px;
+  animation: fadeIn 0.4s ease;
+}
+
+.vault-empty-state-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.vault-empty-state h3 {
+  font-size: 1.2rem;
+  margin: 0 0 8px;
+  color: var(--text-secondary);
+}
+
+.vault-empty-state p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .vault-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .vault-grid {
+    grid-template-columns: 1fr;
+  }
+}
