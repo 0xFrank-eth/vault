@@ -1,6 +1,6 @@
 import type { StoredFile } from '../types/file'
 import { formatFileSize, timeAgo } from '../lib/format'
-import { getFileIcon, isPreviewable, getShelbyBlobUrl, networkOf } from '../lib/fileStorage'
+import { getFileIcon, getPreviewUrl, getShelbyBlobUrl, networkOf } from '../lib/fileStorage'
 import './FileCard.css'
 
 interface Props {
@@ -17,9 +17,7 @@ const chainBadge: Record<string, { label: string; color: string }> = {
 function FileCard({ file, onDelete }: Props) {
   const icon = getFileIcon(file.fileType)
   const badge = chainBadge[file.chain] || { label: file.chain, color: '#888' }
-  const previewUrl = isPreviewable(file.fileType)
-    ? getShelbyBlobUrl(networkOf(file), file.ownerAddress, file.blobName)
-    : null
+  const previewUrl = getPreviewUrl(file)
 
   const handleExplorer = () => {
     if (file.blobExplorerUrl) {

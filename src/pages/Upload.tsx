@@ -1,8 +1,8 @@
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useVaultWallet } from '../wallets/useVaultWallet'
 import { useWalletModal } from '../wallets/WalletModalContext'
-import { saveFile } from '../lib/fileStorage'
+import { saveFile, saveFileBlob } from '../lib/fileStorage'
 import { SHELBY_CONFIG, SHELBY_MODE } from '../lib/shelbyNetwork'
 import type { StoredFile, SupportedChain } from '../types/file'
 import './Upload.css'
@@ -19,6 +19,15 @@ function Upload() {
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState('')
   const [uploadSuccess, setUploadSuccess] = useState(false)
+
+  // Live preview URL for selected file
+  const filePreview = useMemo(() => {
+    if (!selectedFile) return null
+    if (selectedFile.type.startsWith('image/') || selectedFile.type.startsWith('video/')) {
+      return URL.createObjectURL(selectedFile)
+    }
+    return null
+  }, [selectedFile])
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -92,6 +101,7 @@ function Upload() {
       }
 
       saveFile(storedFile)
+      await saveFileBlob(id, selectedFile)
       setUploadSuccess(true)
 
       setTimeout(() => {
@@ -157,7 +167,13 @@ function Upload() {
               />
               {selectedFile ? (
                 <div className="upload-selected">
-                  <div className="upload-selected-icon">📄</div>
+                  {filePreview && selectedFile.type.startsWith('image/') ? (
+                    <img src={filePreview} alt="Preview" className="upload-preview-img" />
+                  ) : filePreview && selectedFile.type.startsWith('video/') ? (
+                    <video src={filePreview} className="upload-preview-video" muted autoPlay loop />
+                  ) : (
+                    <div className="upload-selected-icon">📄</div>
+                  )}
                   <div className="upload-selected-name">{selectedFile.name}</div>
                   <div className="upload-selected-size">
                     {(selectedFile.size / 1024).toFixed(1)} KB
