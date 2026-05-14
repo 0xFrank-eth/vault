@@ -1,14 +1,25 @@
 import { useState, useCallback, useRef, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useWallet } from '@aptos-labs/wallet-adapter-react'
 import { useVaultWallet } from '../wallets/useVaultWallet'
 import { useWalletModal } from '../wallets/WalletModalContext'
 import { saveFile, saveFileBlob } from '../lib/fileStorage'
-import { SHELBY_CONFIG, SHELBY_MODE } from '../lib/shelbyNetwork'
+import { SHELBY_MODE } from '../lib/shelbyNetwork'
+import { uploadToShelby, getAptosExplorerUrl, type UploadStage } from '../lib/shelbyUpload'
 import type { StoredFile, SupportedChain } from '../types/file'
 import './Upload.css'
 
+const stageLabels: Record<UploadStage, string> = {
+  preparing: '📦 Preparing file...',
+  encoding: '🔐 Encoding with erasure coding...',
+  registering: '⛓️ Registering on Aptos blockchain...',
+  uploading: '☁️ Uploading to Shelby storage...',
+  complete: '✅ Complete!',
+}
+
 function Upload() {
   const wallet = useVaultWallet()
+  const aptosWallet = useWallet()
   const walletModal = useWalletModal()
   const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -17,6 +28,7 @@ function Upload() {
   const [caption, setCaption] = useState('')
   const [isDragging, setIsDragging] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadStage, setUploadStage] = useState<UploadStage | null>(null)
   const [uploadError, setUploadError] = useState('')
   const [uploadSuccess, setUploadSuccess] = useState(false)
 
@@ -68,34 +80,39 @@ function Upload() {
       return
     }
 
+    // Real on-chain upload requires Aptos wallet
+    if (!aptosWallet.connected || !aptosWallet.account?.address) {
+      setUploadError('Please connect an Aptos wallet for on-chain upload.')
+      return
+    }
+
     setUploading(true)
     setUploadError('')
+    setUploadStage(null)
 
     try {
-      // Simulate Shelby upload (in production, use ShelbyBrowserClient)
-      // The SDK call would be:
-      // const client = new ShelbyBrowserClient({ network: SHELBY_CONFIG.network })
-      // const result = await client.uploadBlob(file, { signer })
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const result = await uploadToShelby({
+        file: selectedFile,
+        caption,
+        account: { address: String(aptosWallet.account.address) },
+        signAndSubmitTransaction: aptosWallet.signAndSubmitTransaction,
+        onProgress: (stage) => setUploadStage(stage),
+      })
 
       const id = `file-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-      const blobName = `vault/${id}/${selectedFile.name}`
-      const txHash = `0x${Array.from({ length: 64 }, () =>
-        Math.floor(Math.random() * 16).toString(16),
-      ).join('')}`
 
       const storedFile: StoredFile = {
         id,
         fileName: selectedFile.name,
         fileType: selectedFile.type || 'application/octet-stream',
         fileSize: selectedFile.size,
-        blobName,
+        blobName: result.blobName,
         caption,
-        uploaderAddress: wallet.primaryAddress || '',
-        ownerAddress: wallet.primaryAddress || '',
+        uploaderAddress: result.ownerAddress,
+        ownerAddress: result.ownerAddress,
         chain: getChain(),
-        txHash,
-        blobExplorerUrl: `https://explorer.aptoslabs.com/txn/${txHash}?network=${SHELBY_CONFIG.aptosExplorerNetwork}`,
+        txHash: result.hash,
+        blobExplorerUrl: result.blobExplorerUrl || getAptosExplorerUrl(result.hash),
         uploadedAt: Date.now(),
         network: SHELBY_MODE,
       }
@@ -104,9 +121,13 @@ function Upload() {
       await saveFileBlob(id, selectedFile)
       setUploadSuccess(true)
 
+      if (result.uploadError) {
+        console.warn('[vault] Blob registered on-chain but storage upload had issues:', result.uploadError)
+      }
+
       setTimeout(() => {
         navigate('/vault')
-      }, 2000)
+      }, 2500)
     } catch (err) {
       console.error(err)
       setUploadError('Upload failed. Please try again.')
@@ -215,7 +236,7 @@ function Upload() {
             <div className="upload-info">
               <div className="upload-info-item">
                 <span className="upload-info-label">Network</span>
-                <span className="upload-info-value">{SHELBY_CONFIG.label}</span>
+                <span className="upload-info-value">Shelby Testnet</span>
               </div>
               <div className="upload-info-item">
                 <span className="upload-info-label">Chain</span>
@@ -239,7 +260,7 @@ function Upload() {
               {uploading ? (
                 <>
                   <span className="upload-spinner" />
-                  Uploading to Shelby...
+                  {uploadStage ? stageLabels[uploadStage] : 'Uploading...'}
                 </>
               ) : (
                 <>Upload to Vault</>
