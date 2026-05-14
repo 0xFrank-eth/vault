@@ -125,3 +125,49 @@
   background: var(--accent-green);
   animation: pulse-glow 2s infinite;
 }
+
+.wallet-modal-hint {
+  display: block;
+  margin-top: 8px;
+  color: var(--accent-cyan);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.wallet-modal-section {
+  margin-bottom: 16px;
+}
+
+.wallet-modal-section:last-child {
+  margin-bottom: 0;
+}
+
+.wallet-modal-section-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+
+.wallet-modal-section .wallet-option {
+  margin-bottom: 6px;
+}
+
+.wallet-option-img {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  object-fit: contain;
+}
+
+.wallet-option-install {
+  text-decoration: none;
+  border-style: dashed;
+  opacity: 0.8;
+}
+
+.wallet-option-install:hover {
+  opacity: 1;
+}

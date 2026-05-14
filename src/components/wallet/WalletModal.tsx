@@ -11,12 +11,6 @@ interface Props {
   preselect: Ecosystem | null
 }
 
-const ecosystemMeta: Record<Ecosystem, { label: string; icon: string; color: string }> = {
-  aptos: { label: 'Aptos', icon: '⬡', color: '#2dd4bf' },
-  ethereum: { label: 'Ethereum', icon: '◆', color: '#627eea' },
-  solana: { label: 'Solana', icon: '◎', color: '#9945ff' },
-}
-
 function WalletModal({ isOpen, onClose }: Props) {
   const aptosWallet = useWallet()
   const ethConnect = useConnect()
@@ -25,14 +19,12 @@ function WalletModal({ isOpen, onClose }: Props) {
 
   if (!isOpen) return null
 
-  const handleAptosConnect = () => {
-    if (aptosWallet.wallets && aptosWallet.wallets.length > 0) {
-      const w = aptosWallet.wallets[0]
-      aptosWallet.connect(w.name)
-      onClose()
-    } else {
-      window.open('https://petra.app/', '_blank')
-    }
+  /* ── Aptos: show all detected wallets ── */
+  const aptosWallets = aptosWallet.wallets ?? []
+
+  const handleAptosWalletConnect = (walletName: string) => {
+    aptosWallet.connect(walletName)
+    onClose()
   }
 
   const handleEthConnect = () => {
@@ -52,11 +44,8 @@ function WalletModal({ isOpen, onClose }: Props) {
     }
   }
 
-  const ecosystems: { eco: Ecosystem; connect: () => void }[] = [
-    { eco: 'aptos', connect: handleAptosConnect },
-    { eco: 'ethereum', connect: handleEthConnect },
-    { eco: 'solana', connect: handleSolanaConnect },
-  ]
+  // Check if Aptos is already connected
+  const isAptosConnected = wallet.aptos.connected
 
   return (
     <div className="wallet-modal-overlay" onClick={onClose}>
@@ -69,30 +58,98 @@ function WalletModal({ isOpen, onClose }: Props) {
         </div>
         <p className="wallet-modal-desc">
           Connect your wallet to start storing files on Shelby Protocol.
+          <br />
+          <span className="wallet-modal-hint">⚡ Recommended: Petra Wallet on Shelbynet</span>
         </p>
-        <div className="wallet-modal-options">
-          {ecosystems.map(({ eco, connect }) => {
-            const meta = ecosystemMeta[eco]
-            const state = wallet[eco]
-            return (
+
+        {/* ── Aptos Wallets ── */}
+        <div className="wallet-modal-section">
+          <div className="wallet-modal-section-title" style={{ color: '#2dd4bf' }}>
+            ⬡ Aptos
+          </div>
+          {isAptosConnected ? (
+            <button
+              className="wallet-option connected"
+              onClick={() => { aptosWallet.disconnect(); }}
+            >
+              <span className="wallet-option-icon" style={{ color: '#2dd4bf' }}>⬡</span>
+              <div className="wallet-option-info">
+                <span className="wallet-option-label">{aptosWallet.wallet?.name || 'Aptos'}</span>
+                <span className="wallet-option-status">Connected — Tap to disconnect</span>
+              </div>
+              <span className="wallet-option-dot" />
+            </button>
+          ) : aptosWallets.length > 0 ? (
+            aptosWallets.map((w) => (
               <button
-                key={eco}
-                className={`wallet-option ${state.connected ? 'connected' : ''}`}
-                onClick={state.connected ? state.disconnect : connect}
+                key={w.name}
+                className="wallet-option"
+                onClick={() => handleAptosWalletConnect(w.name)}
               >
-                <span className="wallet-option-icon" style={{ color: meta.color }}>
-                  {meta.icon}
-                </span>
+                {w.icon ? (
+                  <img src={w.icon} alt={w.name} className="wallet-option-img" />
+                ) : (
+                  <span className="wallet-option-icon" style={{ color: '#2dd4bf' }}>⬡</span>
+                )}
                 <div className="wallet-option-info">
-                  <span className="wallet-option-label">{meta.label}</span>
-                  <span className="wallet-option-status">
-                    {state.connected ? 'Connected' : 'Connect'}
-                  </span>
+                  <span className="wallet-option-label">{w.name}</span>
+                  <span className="wallet-option-status">Connect</span>
                 </div>
-                {state.connected && <span className="wallet-option-dot" />}
               </button>
-            )
-          })}
+            ))
+          ) : (
+            <a
+              href="https://petra.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="wallet-option wallet-option-install"
+            >
+              <span className="wallet-option-icon" style={{ color: '#2dd4bf' }}>⬡</span>
+              <div className="wallet-option-info">
+                <span className="wallet-option-label">Install Petra Wallet</span>
+                <span className="wallet-option-status">Required for Shelby</span>
+              </div>
+            </a>
+          )}
+        </div>
+
+        {/* ── Other chains ── */}
+        <div className="wallet-modal-section">
+          <div className="wallet-modal-section-title" style={{ color: '#627eea' }}>
+            ◆ Ethereum
+          </div>
+          <button
+            className={`wallet-option ${wallet.ethereum.connected ? 'connected' : ''}`}
+            onClick={wallet.ethereum.connected ? wallet.ethereum.disconnect : handleEthConnect}
+          >
+            <span className="wallet-option-icon" style={{ color: '#627eea' }}>◆</span>
+            <div className="wallet-option-info">
+              <span className="wallet-option-label">Ethereum</span>
+              <span className="wallet-option-status">
+                {wallet.ethereum.connected ? 'Connected' : 'Connect'}
+              </span>
+            </div>
+            {wallet.ethereum.connected && <span className="wallet-option-dot" />}
+          </button>
+        </div>
+
+        <div className="wallet-modal-section">
+          <div className="wallet-modal-section-title" style={{ color: '#9945ff' }}>
+            ◎ Solana
+          </div>
+          <button
+            className={`wallet-option ${wallet.solana.connected ? 'connected' : ''}`}
+            onClick={wallet.solana.connected ? wallet.solana.disconnect : handleSolanaConnect}
+          >
+            <span className="wallet-option-icon" style={{ color: '#9945ff' }}>◎</span>
+            <div className="wallet-option-info">
+              <span className="wallet-option-label">Solana</span>
+              <span className="wallet-option-status">
+                {wallet.solana.connected ? 'Connected' : 'Connect'}
+              </span>
+            </div>
+            {wallet.solana.connected && <span className="wallet-option-dot" />}
+          </button>
         </div>
       </div>
     </div>
