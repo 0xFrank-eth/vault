@@ -18,6 +18,7 @@ function Home() {
 
       {/* Hero Section */}
       <section className="home-hero">
+        <img src="/logo.png" alt="Vault" className="home-hero-logo" />
         <div className="home-badge">
           <span className="home-badge-dot" />
           Built on Shelby Protocol · Aptos Network
@@ -155,7 +156,7 @@ function Home() {
       {/* Footer */}
       <footer className="home-footer">
         <div className="home-footer-brand">
-          <span className="navbar-logo">◈</span>
+          <img src="/logo.png" alt="Vault" className="home-footer-logo" />
           <span>Vault</span>
         </div>
         <p className="home-footer-text">

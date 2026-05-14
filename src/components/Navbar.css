@@ -19,12 +19,17 @@
   text-decoration: none;
 }
 
-.navbar-logo {
-  font-size: 1.5rem;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.navbar-logo-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: contain;
+  transition: all 0.3s ease;
+}
+
+.navbar-brand:hover .navbar-logo-img {
+  filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.5));
+  transform: scale(1.05);
 }
 
 .navbar-title {

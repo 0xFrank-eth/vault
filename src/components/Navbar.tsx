@@ -18,7 +18,7 @@ function Navbar() {
   return (
     <nav className="navbar glass">
       <Link to="/" className="navbar-brand">
-        <span className="navbar-logo">◈</span>
+        <img src="/logo.png" alt="Vault" className="navbar-logo-img" />
         <span className="navbar-title">Vault</span>
       </Link>
 
