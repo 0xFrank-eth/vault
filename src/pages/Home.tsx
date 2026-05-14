@@ -18,7 +18,6 @@ function Home() {
 
       {/* Hero Section */}
       <section className="home-hero">
-        <img src="/logo.png" alt="Vault" className="home-hero-logo" />
         <div className="home-badge">
           <span className="home-badge-dot" />
           Built on Shelby Protocol · Aptos Network
