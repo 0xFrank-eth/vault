@@ -5,7 +5,7 @@ import { useVaultWallet } from '../wallets/useVaultWallet'
 import { useWalletModal } from '../wallets/WalletModalContext'
 import { saveFile, saveFileBlob } from '../lib/fileStorage'
 import { SHELBY_MODE } from '../lib/shelbyNetwork'
-import { uploadToShelby, getShelbyTxExplorerUrl, type UploadStage } from '../lib/shelbyUpload'
+import { uploadToShelby, getShelbyTxExplorerUrl, fundWithAPT, fundWithShelbyUSD, type UploadStage } from '../lib/shelbyUpload'
 import type { StoredFile, SupportedChain } from '../types/file'
 import './Upload.css'
 
@@ -31,6 +31,8 @@ function Upload() {
   const [uploadStage, setUploadStage] = useState<UploadStage | null>(null)
   const [uploadError, setUploadError] = useState('')
   const [uploadSuccess, setUploadSuccess] = useState(false)
+  const [funding, setFunding] = useState(false)
+  const [fundSuccess, setFundSuccess] = useState('')
 
   // Live preview URL for selected file
   const filePreview = useMemo(() => {
@@ -133,6 +135,30 @@ function Upload() {
       setUploadError('Upload failed. Please try again.')
     } finally {
       setUploading(false)
+    }
+  }
+
+  const handleFundAccount = async () => {
+    if (!aptosWallet.connected || !aptosWallet.account?.address) {
+      setUploadError('Please connect an Aptos wallet first.')
+      return
+    }
+
+    setFunding(true)
+    setUploadError('')
+    setFundSuccess('')
+
+    try {
+      const addr = String(aptosWallet.account.address)
+      await fundWithAPT(addr)
+      await fundWithShelbyUSD(addr)
+      setFundSuccess('✅ Funded! You received 1 APT + 1 ShelbyUSD on Shelbynet.')
+    } catch (err) {
+      console.error('[faucet]', err)
+      const msg = err instanceof Error ? err.message : String(err)
+      setUploadError(`Faucet error: ${msg}`)
+    } finally {
+      setFunding(false)
     }
   }
 
@@ -250,6 +276,30 @@ function Upload() {
 
             {uploadError && (
               <div className="upload-error">{uploadError}</div>
+            )}
+
+            {fundSuccess && (
+              <div className="upload-fund-success">{fundSuccess}</div>
+            )}
+
+            {/* Faucet section */}
+            {aptosWallet.connected && (
+              <div className="upload-faucet">
+                <div className="upload-faucet-text">
+                  🚰 Need Shelbynet tokens?
+                </div>
+                <button
+                  className="upload-faucet-btn"
+                  onClick={handleFundAccount}
+                  disabled={funding}
+                >
+                  {funding ? (
+                    <><span className="upload-spinner" /> Funding...</>
+                  ) : (
+                    'Get Free APT + ShelbyUSD'
+                  )}
+                </button>
+              </div>
             )}
 
             <button

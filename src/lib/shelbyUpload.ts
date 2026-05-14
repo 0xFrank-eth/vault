@@ -184,3 +184,27 @@ export function getShelbyTxExplorerUrl(hash: string): string {
 export function getAptosExplorerUrl(hash: string): string {
   return `https://explorer.aptoslabs.com/txn/${hash}?network=${SHELBY_CONFIG.aptosExplorerNetwork}`
 }
+
+/* ── Faucet helpers ── */
+
+/**
+ * Fund an account with APT tokens (for gas fees) on Shelbynet.
+ * Uses the SDK's built-in faucet.
+ */
+export async function fundWithAPT(address: string): Promise<string> {
+  return shelbyClient.fundAccountWithAPT({
+    address,
+    amount: 100_000_000, // 1 APT = 100,000,000 octas
+  })
+}
+
+/**
+ * Fund an account with ShelbyUSD tokens (for storage fees) on Shelbynet.
+ * Uses the SDK's built-in faucet.
+ */
+export async function fundWithShelbyUSD(address: string): Promise<string> {
+  return shelbyClient.fundAccountWithShelbyUSD({
+    address,
+    amount: 100_000_000, // 1 ShelbyUSD
+  })
+}

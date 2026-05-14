@@ -251,6 +251,62 @@
   margin-bottom: 16px;
 }
 
+/* Fund success */
+.upload-fund-success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+
+/* Faucet */
+.upload-faucet {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(6, 182, 212, 0.06);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+}
+
+.upload-faucet-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.upload-faucet-btn {
+  padding: 8px 16px;
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  color: var(--accent-cyan);
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.upload-faucet-btn:hover:not(:disabled) {
+  background: rgba(6, 182, 212, 0.25);
+  border-color: var(--accent-cyan);
+  transform: translateY(-1px);
+}
+
+.upload-faucet-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Submit button */
 .upload-submit {
   width: 100%;
