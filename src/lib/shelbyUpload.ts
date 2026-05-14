@@ -167,10 +167,20 @@ export async function uploadToShelby(
   }
 }
 
-/* ── Explorer URL helper ── */
+/* ── Explorer URL helpers ── */
 
-const APTOS_EXPLORER_URL = 'https://explorer.aptoslabs.com'
+/**
+ * Returns the Shelby explorer URL for a transaction.
+ * Shelby has its own explorer at explorer.shelby.xyz
+ */
+export function getShelbyTxExplorerUrl(hash: string): string {
+  return `https://explorer.shelby.xyz/${SHELBY_CONFIG.shelbyExplorerNetwork}/txn/${hash}`
+}
 
+/**
+ * Returns the Aptos explorer URL (fallback).
+ * Note: Only works if the tx is on standard Aptos testnet, not Shelbynet.
+ */
 export function getAptosExplorerUrl(hash: string): string {
-  return `${APTOS_EXPLORER_URL}/txn/${hash}?network=${SHELBY_CONFIG.aptosExplorerNetwork}`
+  return `https://explorer.aptoslabs.com/txn/${hash}?network=${SHELBY_CONFIG.aptosExplorerNetwork}`
 }

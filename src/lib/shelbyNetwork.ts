@@ -33,7 +33,7 @@ export const SHELBY_CONFIGS: Record<ShelbyMode, ShelbyNetworkConfig> = {
 function resolveMode(): ShelbyMode {
   const raw = (import.meta.env.VITE_SHELBY_MODE as string | undefined)?.trim()
   if (raw === 'shelbynet' || raw === 'aptos-testnet') return raw
-  return 'aptos-testnet'
+  return 'shelbynet'
 }
 
 export const SHELBY_MODE: ShelbyMode = resolveMode()

@@ -5,7 +5,7 @@ import { useVaultWallet } from '../wallets/useVaultWallet'
 import { useWalletModal } from '../wallets/WalletModalContext'
 import { saveFile, saveFileBlob } from '../lib/fileStorage'
 import { SHELBY_MODE } from '../lib/shelbyNetwork'
-import { uploadToShelby, getAptosExplorerUrl, type UploadStage } from '../lib/shelbyUpload'
+import { uploadToShelby, getShelbyTxExplorerUrl, type UploadStage } from '../lib/shelbyUpload'
 import type { StoredFile, SupportedChain } from '../types/file'
 import './Upload.css'
 
@@ -112,7 +112,7 @@ function Upload() {
         ownerAddress: result.ownerAddress,
         chain: getChain(),
         txHash: result.hash,
-        blobExplorerUrl: result.blobExplorerUrl || getAptosExplorerUrl(result.hash),
+        blobExplorerUrl: result.blobExplorerUrl || getShelbyTxExplorerUrl(result.hash),
         uploadedAt: Date.now(),
         network: SHELBY_MODE,
       }
